@@ -18,7 +18,8 @@ import java.util.logging.Logger;
  * @author enricosantesarti
  */
 public class ResultManager {
-     void saveFeaturesToCSV(List<PlasticPiece> blobs, File filename) {
+
+    void saveFeaturesToCSV(List<PlasticPiece> blobs, File filename) {
         FileWriter writerCSV = null;
         int numeroTotalePEzz = blobs.size();
         int numeroFRA = 0;
@@ -26,25 +27,25 @@ public class ResultManager {
         int numeroPEL = 0;
         int numeroLINE = 0;
         int numeroTAR = 0;
-        for(PlasticPiece i : blobs)
-        {
-            if(null != i.getParticleType())
-            switch (i.getParticleType()) {
-                case "FRA":
-                    numeroFRA++;
-                    break;
-                case "PEL":
-                    numeroPEL++;
-                    break;
-                case "TAR":
-                    numeroTAR++;
-                    break;
-                case "ORG":
-                    numeroORG++;
-                    break;
-                default:
-                    numeroLINE++;
-                    break;
+        for (PlasticPiece i : blobs) {
+            if (null != i.getParticleType()) {
+                switch (i.getParticleType()) {
+                    case "FRA":
+                        numeroFRA++;
+                        break;
+                    case "PEL":
+                        numeroPEL++;
+                        break;
+                    case "TAR":
+                        numeroTAR++;
+                        break;
+                    case "ORG":
+                        numeroORG++;
+                        break;
+                    default:
+                        numeroLINE++;
+                        break;
+                }
             }
         }
         try {
@@ -55,9 +56,9 @@ public class ResultManager {
 //            write header line
             PlasticPiece b = iterBlob.next();
             //String featureNames[] = b.getGeometricFeatures().featureNames;
-            String line = "Id" + ";area" + ";perimeter" 
-                    + ";avgR" + ";avgG" + ";avgB"+";type";
-         
+            String line = "Id" + ";area" + ";perimeter"
+                    + ";avgR" + ";avgG" + ";avgB" + ";type";
+
             line += "\n";
             writerCSV.write(line);
 //            writerCSV.write("\n");
@@ -71,17 +72,16 @@ public class ResultManager {
                 line = String.valueOf(b.getId());
                 line += ";" + String.format("%.1f", (double) geometricFeatures.area).replace(",", ".");
                 line += ";" + String.format("%.1f", (double) geometricFeatures.perimeter).replace(",", ".");
-                
 
                 for (int i = 1; i < 4; i++) {
                     line += ";" + String.format("%.5f", colorFeatures.avgRGB[i]).replace(",", ".");
                 }
-                
+
                 line += ";" + b.getParticleType() + "\n";
-            System.out.println("linea->" + line);
+//                System.out.println("linea->" + line);
                 writerCSV.write(line);
             }
-            String lineaFinale = "Total number of plastic pieces: " + numeroTotalePEzz +"\nTAR: " + numeroTAR+"\nFRA: " + numeroFRA+"\nPEL: " + numeroPEL+"\nLINE: " + numeroLINE+"\nORG: " + numeroORG;
+            String lineaFinale = "Total number of plastic pieces: " + numeroTotalePEzz + "\nTAR: " + numeroTAR + "\nFRA: " + numeroFRA + "\nPEL: " + numeroPEL + "\nLINE: " + numeroLINE + "\nORG: " + numeroORG;
             writerCSV.write(lineaFinale);
         } catch (IOException ex) {
             Logger.getLogger(ResultManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -93,7 +93,7 @@ public class ResultManager {
             }
         }
     }
-     
+
     void saveFeaturesToCSVVEro(List<PlasticPiece> blobs, File filename) {
         FileWriter writerCSV = null;
         try {
@@ -105,19 +105,14 @@ public class ResultManager {
             PlasticPiece b = iterBlob.next();
             //String featureNames[] = b.getGeometricFeatures().featureNames;
             String line = "Id" + ",area" + ",perimeter" + ",compactness" + ",radiusRatio"
-                    + ",widthHeightRatio" + ",BBtoAreaRatio" 
+                    + ",widthHeightRatio" + ",BBtoAreaRatio"
                     + ",ellipseAxisRatio"
-                    
                     + ",avgR" + ",avgG" + ",avgB"
-                   
-                    
                     + ",varR" + ",varG" + ",varB"
-                    
                     + ",avgH" + ",avgS" + ",avgV"
                     + ",varH" + ",varS" + ",varV";
-            for(int i = 0; i<b.getLbp().length ; i++)
-            {
-                line += ",lbp"+ (i+1);
+            for (int i = 0; i < b.getLbp().length; i++) {
+                line += ",lbp" + (i + 1);
             }
             line += ",class\n";
             writerCSV.write(line);
@@ -150,12 +145,11 @@ public class ResultManager {
                 for (int i = 0; i < 3; i++) {
                     line += "," + String.format("%.5f", colorFeatures.varHSV[i]).replace(",", ".");
                 }
-                for(int i = 0; i<b.getLbp().length ; i++)
-                {
-                    line+= ","+ String.format("%.5f",b.getLbp()[i]).replace(",", ".");
+                for (int i = 0; i < b.getLbp().length; i++) {
+                    line += "," + String.format("%.5f", b.getLbp()[i]).replace(",", ".");
                 }
                 line += ",PEL\n";
-            System.out.println("linea->" + line);
+//                System.out.println("linea->" + line);
                 writerCSV.write(line);
             }
         } catch (IOException ex) {
