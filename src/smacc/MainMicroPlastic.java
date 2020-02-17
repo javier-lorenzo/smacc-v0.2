@@ -8,6 +8,7 @@ package smacc;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
@@ -28,7 +29,7 @@ import weka.core.*;
  * @author enricosantesarti
  */
 public class MainMicroPlastic extends javax.swing.JFrame {
-    
+
     private Image ImageBN = null;
     private Image ImageColor = null;
     private BufferedImage ImageStich = null;
@@ -46,14 +47,18 @@ public class MainMicroPlastic extends javax.swing.JFrame {
      */
     public MainMicroPlastic() {
         initComponents();
-        
+
         classifierPELorNot = new ClassifierManager(new File("Classifiers/PelletOrRest.model"), new String[]{"REST", "PEL"});
         classifierLineorNot = new ClassifierManager(new File("Classifiers/LineOrRest.model"), new String[]{"REST", "LINE"});
         classifierRest = new ClassifierManager(new File("Classifiers/Rest.model"), new String[]{"FRA", "ORG", "TAR"});
 
+        // disable read color and classify buttons
+        readColorImageItem.setEnabled(false);
+        classifyItem.setEnabled(false);
+
         // disable save results buttons
-        saveImgResultButton.setEnabled(false);
-        saveCSVButton.setEnabled(false);
+        saveImgResultIten.setEnabled(false);
+        saveCSVItem.setEnabled(false);
     }
 
     /**
@@ -68,22 +73,22 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         scrollPane1 = new java.awt.ScrollPane();
         imagePanel1 = new smacc.ImagePanel();
-        labelInitTitle = new javax.swing.JLabel();
-        BeWImageButton = new javax.swing.JButton();
-        ColoredImageButton = new javax.swing.JButton();
-        ClassifyButton = new javax.swing.JButton();
-        labelInitHelp = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
-        newButton = new javax.swing.JMenuItem();
-        saveCSVButton = new javax.swing.JMenuItem();
-        saveImgResultButton = new javax.swing.JMenuItem();
-        exitButton = new javax.swing.JMenuItem();
+        newSampleItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        readTranspImageItem = new javax.swing.JMenuItem();
+        readColorImageItem = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        saveCSVItem = new javax.swing.JMenuItem();
+        saveImgResultIten = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        exitItem = new javax.swing.JMenuItem();
         processMenu = new javax.swing.JMenu();
         classifyItem = new javax.swing.JMenuItem();
         saveImageItem = new javax.swing.JMenuItem();
         saveResultItem = new javax.swing.JMenuItem();
-        optonsSubmenu = new javax.swing.JMenu();
+        optionsSubmenu = new javax.swing.JMenu();
         setMinSizeItem = new javax.swing.JMenuItem();
         setBorderItem = new javax.swing.JMenuItem();
         setImageSizeItem = new javax.swing.JMenuItem();
@@ -92,6 +97,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         aboutItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("SMACC v0.2");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -100,101 +106,19 @@ public class MainMicroPlastic extends javax.swing.JFrame {
 
         jPanel1.setPreferredSize(new Dimension(850,600));
 
-        Color colorBack = new Color(255,77,77);
-        imagePanel1.setBackground(colorBack);
-        this.setTitle("SMACC v0.2");
-
-        labelInitTitle.setText("Init Title");
-        labelInitTitle.setHorizontalAlignment(SwingConstants.CENTER);
-        labelInitTitle.setForeground(Color.white);
-
-        labelInitTitle.setFont(new Font("Serif", Font.BOLD, 26));
-        labelInitTitle.setText("MicroPlastic Classifier");
-
-        BeWImageButton.setText("jButton1");
-        BeWImageButton.setText("Choose B&W image");
-
-        BeWImageButton.setBackground(Color.WHITE);
-        BeWImageButton.setForeground(new Color(255, 77, 77));
-        BeWImageButton.setFocusPainted(false);
-        BeWImageButton.setFont(new Font("Tahoma", Font.BOLD, 12));
-        BeWImageButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BeWImageButtonActionPerformed(evt);
-            }
-        });
-
-        ColoredImageButton.setText("jButton2");
-        ColoredImageButton.setText("Choose colored image");
-        ColoredImageButton.setVisible(false);
-        ColoredImageButton.setBackground(Color.WHITE);
-        ColoredImageButton.setForeground(new Color(255, 77, 77));
-        ColoredImageButton.setFocusPainted(false);
-        ColoredImageButton.setFont(new Font("Tahoma", Font.BOLD, 12));
-        ColoredImageButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ColoredImageButtonActionPerformed(evt);
-            }
-        });
-
-        ClassifyButton.setText("jButton3");
-        ClassifyButton.setText("classifyItem");
-
-        ClassifyButton.setBackground(Color.WHITE);
-        ClassifyButton.setForeground(new Color(255, 77, 77));
-        ClassifyButton.setFocusPainted(false);
-        ClassifyButton.setFont(new Font("Tahoma", Font.BOLD, 12));
-        ClassifyButton.setVisible(false);
-        ClassifyButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ClassifyButtonActionPerformed(evt);
-            }
-        });
-
-        labelInitHelp.setText("Init Help");
-        labelInitHelp.setText("<html>This program is a microplastic classifier. For the correct operation of the software it is mandatory to select two images, the first in black and white and the second in color space, then press the button 'classifyItem' which will classify each individual piece of plastic in: TAR, PEL, ORG, FRA or LINE.</html>");
-
-        labelInitHelp.setHorizontalAlignment(SwingConstants.CENTER);
-        labelInitHelp.setForeground(Color.white);
-
-        labelInitHelp.setFont(new Font("Serif", Font.BOLD, 20));
+        //Color colorBack = new Color(255,77,77);
+        //imagePanel1.setBackground(colorBack);
+        //this.setTitle("SMACC v0.2");
 
         javax.swing.GroupLayout imagePanel1Layout = new javax.swing.GroupLayout(imagePanel1);
         imagePanel1.setLayout(imagePanel1Layout);
         imagePanel1Layout.setHorizontalGroup(
             imagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(imagePanel1Layout.createSequentialGroup()
-                .addGroup(imagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(imagePanel1Layout.createSequentialGroup()
-                        .addGap(53, 53, 53)
-                        .addGroup(imagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(imagePanel1Layout.createSequentialGroup()
-                                .addComponent(BeWImageButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(ColoredImageButton))
-                            .addComponent(labelInitHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 734, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(imagePanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(labelInitTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 789, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(53, 53, 53))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, imagePanel1Layout.createSequentialGroup()
-                .addComponent(ClassifyButton)
-                .addGap(373, 373, 373))
+            .addGap(0, 852, Short.MAX_VALUE)
         );
         imagePanel1Layout.setVerticalGroup(
             imagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(imagePanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(labelInitTitle)
-                .addGap(60, 60, 60)
-                .addComponent(labelInitHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 187, Short.MAX_VALUE)
-                .addComponent(ClassifyButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(imagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ColoredImageButton)
-                    .addComponent(BeWImageButton))
-                .addGap(51, 51, 51))
+            .addGap(0, 579, Short.MAX_VALUE)
         );
 
         scrollPane1.add(imagePanel1);
@@ -203,7 +127,9 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 742, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -212,38 +138,67 @@ public class MainMicroPlastic extends javax.swing.JFrame {
 
         fileMenu.setText("File");
 
-        newButton.setText("New sample");
-        newButton.addActionListener(new java.awt.event.ActionListener() {
+        newSampleItem.setText("New sample");
+        newSampleItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newButtonActionPerformed(evt);
+                newSampleItemActionPerformed(evt);
             }
         });
-        fileMenu.add(newButton);
+        fileMenu.add(newSampleItem);
+        fileMenu.add(jSeparator1);
 
-        saveCSVButton.setText("Save CSV resut");
-        fileMenu.add(saveCSVButton);
-
-        saveImgResultButton.setText("Save result image");
-        saveImgResultButton.addActionListener(new java.awt.event.ActionListener() {
+        readTranspImageItem.setText("Read transparency image");
+        readTranspImageItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveImgResultButtonActionPerformed(evt);
+                readTranspImageItemActionPerformed(evt);
             }
         });
-        fileMenu.add(saveImgResultButton);
+        fileMenu.add(readTranspImageItem);
 
-        exitButton.setText("Exit");
-        exitButton.addActionListener(new java.awt.event.ActionListener() {
+        readColorImageItem.setText("Read color image");
+        readColorImageItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitButtonActionPerformed(evt);
+                readColorImageItemActionPerformed(evt);
             }
         });
-        fileMenu.add(exitButton);
+        fileMenu.add(readColorImageItem);
+        fileMenu.add(jSeparator2);
+
+        saveCSVItem.setText("Save CSV resut");
+        saveCSVItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveCSVItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(saveCSVItem);
+
+        saveImgResultIten.setText("Save result image");
+        saveImgResultIten.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveImgResultItenActionPerformed(evt);
+            }
+        });
+        fileMenu.add(saveImgResultIten);
+        fileMenu.add(jSeparator3);
+
+        exitItem.setText("Exit");
+        exitItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(exitItem);
 
         menuBar.add(fileMenu);
 
         processMenu.setText("Process");
 
         classifyItem.setText("Classify");
+        classifyItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                classifyItemActionPerformed(evt);
+            }
+        });
         processMenu.add(classifyItem);
 
         saveImageItem.setText("Save Image");
@@ -265,7 +220,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         });
         processMenu.add(saveResultItem);
 
-        optonsSubmenu.setText("Options");
+        optionsSubmenu.setText("Options");
 
         setMinSizeItem.setText("Set minimum size");
         setMinSizeItem.addActionListener(new java.awt.event.ActionListener() {
@@ -273,7 +228,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
                 setMinSizeItemActionPerformed(evt);
             }
         });
-        optonsSubmenu.add(setMinSizeItem);
+        optionsSubmenu.add(setMinSizeItem);
         setMinSizeItem.getAccessibleContext().setAccessibleDescription("");
 
         setBorderItem.setText("Set border size");
@@ -282,7 +237,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
                 setBorderItemActionPerformed(evt);
             }
         });
-        optonsSubmenu.add(setBorderItem);
+        optionsSubmenu.add(setBorderItem);
 
         setImageSizeItem.setText("Image Size");
         setImageSizeItem.setVisible(true);
@@ -291,9 +246,9 @@ public class MainMicroPlastic extends javax.swing.JFrame {
                 setImageSizeItemActionPerformed(evt);
             }
         });
-        optonsSubmenu.add(setImageSizeItem);
+        optionsSubmenu.add(setImageSizeItem);
 
-        processMenu.add(optonsSubmenu);
+        processMenu.add(optionsSubmenu);
 
         menuBar.add(processMenu);
 
@@ -348,10 +303,10 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     private void saveResultItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveResultItemActionPerformed
         saveCSVresults("CSVresult.csv");
     }//GEN-LAST:event_saveResultItemActionPerformed
-    
+
     private void saveCSVresults(String csVresultcsv) {
         // Use relative path for Unix systems
-        File f = new File("CSVresult.csv");
+        File f = new File(csVresultcsv);
         ResultManager n = new ResultManager();
         n.saveFeaturesToCSV(segmenter.getPlasticsArray(), f);
         JOptionPane optionPane = new JOptionPane("CSV file has been saved!", JOptionPane.OK_OPTION);
@@ -363,7 +318,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     private void setMinSizeItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setMinSizeItemActionPerformed
         String s = (String) JOptionPane.showInputDialog(rootPane, "Set the minimum area of particles:", "Particles Size",
                 JOptionPane.PLAIN_MESSAGE, null, null, this.minArea);
-        
+
         try {
             this.minArea = Double.parseDouble(s);
             segmenter.setMinSize(this.minArea);
@@ -373,22 +328,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     }//GEN-LAST:event_setMinSizeItemActionPerformed
 
     private void setImageSizeItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setImageSizeItemActionPerformed
-        
-        String s = (String) JOptionPane.showInputDialog(rootPane, "Set the image scale (from 0 to 1):", "Image Scale",
-                JOptionPane.PLAIN_MESSAGE, null, null, this.scale);
-        
-        try {
-            double scaler = Double.parseDouble(s);
-            if (scaler >= 0 && scaler <= 1) {
-                this.scale = scaler;
-            } else {
-                JOptionPane.showMessageDialog(rootPane, "Scale to big");
-            }
-            
-        } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(rootPane, "Scale size format incorrect");
-        }
-
+        changeImageScale();
     }//GEN-LAST:event_setImageSizeItemActionPerformed
 
     private void setBorderItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setBorderItemActionPerformed
@@ -402,137 +342,22 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_setBorderItemActionPerformed
 
-    private void newButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newButtonActionPerformed
+    private void newSampleItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newSampleItemActionPerformed
         a.setVisible(false);
-        
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 a = new MainMicroPlastic();
                 a.setVisible(true);
             }
         });
-        
 
-    }//GEN-LAST:event_newButtonActionPerformed
 
-    private void ClassifyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ClassifyButtonActionPerformed
-        
-        JOptionPane.showMessageDialog(null, "Wait a moment the result will be shown automatically");
-        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        
-        BufferedImage imageA, imageB;
-        imageA = ImageBN.getIamgeColored();
-        imageB = ImageColor.getIamgeColored();
-        
-        ImageStich = stitch(imageA, imageB, GrayU8.class);
-        imagePanel1.setImg(ImageStich);
-        segmenter.removeInutilPieces(ConvertBufferedImage.convertFrom(this.ImageStich, true, ImageType.pl(3, GrayU8.class)), segmenter.getPlasticsArray());
-        segmenter.removeOneInAnother(segmenter.getPlasticsArray());
-        
-        imagePanel1.writeParticlesId(segmenter.getPlasticsArray(), true);
-        
-        ColorFeature prova = new ColorFeature();
-        segmenter.setPlasticsArray(prova.ComputeColorFeatures(this.ImageStich, segmenter.getPlasticsArray()));
-        
-        for (int a = 0; a < segmenter.getPlasticsArray().size(); a++) {
-            int x = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.x;
-            int y = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.y;
-            int w = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.width;
-            int h = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.height;
-            BufferedImage subImgage = imagePanel1.getImg().getSubimage(x, y, w, h);
-            LocalBinaryPatternsTest lbp = new LocalBinaryPatternsTest();
-            lbp.setUp();
-            try {
-                segmenter.getPlasticsArray().get(a).setLbp(lbp.smallRadiuslargeNeighbours2(subImgage));
-            } catch (Exception ex) {
-                Logger.getLogger(MainMicroPlastic.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        // classification proces
-        classifyLineOrNot();
-        classifyPEl();
-        classifyRest();
-        
-        this.setCursor(Cursor.getDefaultCursor());
-        
-        JOptionPane.showMessageDialog(null, "Classification process finishes");
-        
-        imagePanel1.writeLineOrNot(segmenter.getPlasticsArray(), true);
-        imagePanel1.setImg(imagePanel1.ridemension(imagePanel1.getImg(), scale));
-        
-        BeWImageButton.setVisible(false);
-        ColoredImageButton.setVisible(false);
-        ClassifyButton.setVisible(false);
-        labelInitTitle.setVisible(false);
-        labelInitHelp.setVisible(false);
-        
-        setImageSizeItem.setVisible(false);
-        
-        saveImageItem.setVisible(true);
-        saveResultItem.setVisible(true);
-        
-        setMinSizeItem.setVisible(false);
-        setBorderItem.setVisible(false);
-        
-        repaint();
-        
-        saveCSVresults("CSV-results.csv");
-        
-        saveCSVButton.setEnabled(true);
-        saveImgResultButton.setEnabled(true);
-    }//GEN-LAST:event_ClassifyButtonActionPerformed
+    }//GEN-LAST:event_newSampleItemActionPerformed
 
-    private void ColoredImageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ColoredImageButtonActionPerformed
-        imagePanel1.setVisible(true);
-        JFileChooser fc = new JFileChooser(new File("."));
-        FileFilter filter = new FileNameExtensionFilter("JPEG file", "jpg", "jpeg");
-        fc.addChoosableFileFilter(filter);
-        filter = new FileNameExtensionFilter("PNG file", "png");
-        fc.addChoosableFileFilter(filter);
-        int res = fc.showOpenDialog(null);
-        if (res == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fc.getSelectedFile();
-            try {
-                this.ImageColor = new Image(selectedFile);
-                JOptionPane.showMessageDialog(null, "OK\nImage loaded correctly");
-                ClassifyButton.setVisible(true);
-                BeWImageButton.setVisible(false);
-                ColoredImageButton.setVisible(false);
-            } catch (IOException ex) {
-            }
-        }
-
-    }//GEN-LAST:event_ColoredImageButtonActionPerformed
-
-    private void BeWImageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BeWImageButtonActionPerformed
-        
-        JFileChooser fc = new JFileChooser(new File("."));
-        
-        FileFilter filter = new FileNameExtensionFilter("JPEG file", "jpg", "jpeg");
-        fc.addChoosableFileFilter(filter);
-        filter = new FileNameExtensionFilter("PNG file", "png");
-        fc.addChoosableFileFilter(filter);
-        
-        int res = fc.showOpenDialog(null);
-        
-        if (res == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fc.getSelectedFile();
-            try {
-                this.ImageBN = new Image(selectedFile);
-                segmenter.segmentImage(ConvertBufferedImage.convertFrom(this.ImageBN.getIamgeColored(), true, ImageType.pl(3, GrayU8.class)));
-                JOptionPane.showMessageDialog(null, "OK\nImage loaded correctly");
-                ColoredImageButton.setVisible(true);
-                BeWImageButton.setVisible(false);
-            } catch (IOException ex) {
-            }
-        }
-        
-
-    }//GEN-LAST:event_BeWImageButtonActionPerformed
-
-    private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
+    private void exitItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitItemActionPerformed
         confirmCloseWindow();
-    }//GEN-LAST:event_exitButtonActionPerformed
+    }//GEN-LAST:event_exitItemActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         confirmCloseWindow();
@@ -565,14 +390,39 @@ public class MainMicroPlastic extends javax.swing.JFrame {
                 + "</html>", "How to use", JOptionPane.PLAIN_MESSAGE);
     }//GEN-LAST:event_useItemActionPerformed
 
-    private void saveImgResultButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveImgResultButtonActionPerformed
+    private void saveImgResultItenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveImgResultItenActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_saveImgResultButtonActionPerformed
-    
+    }//GEN-LAST:event_saveImgResultItenActionPerformed
+
+    private void classifyItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_classifyItemActionPerformed
+        classifyImageParticles();
+        
+        classifyItem.setEnabled(false);
+        optionsSubmenu.setEnabled(false);
+        
+        saveImgResultIten.setEnabled(true);
+        saveCSVItem.setEnabled(true);
+    }//GEN-LAST:event_classifyItemActionPerformed
+
+    private void readTranspImageItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readTranspImageItemActionPerformed
+        readTransparencyImage();
+        readTranspImageItem.setEnabled(false);
+        readColorImageItem.setEnabled(true);
+    }//GEN-LAST:event_readTranspImageItemActionPerformed
+
+    private void readColorImageItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readColorImageItemActionPerformed
+        readColorImage();
+        readColorImageItem.setEnabled(false);
+        classifyItem.setEnabled(true);
+    }//GEN-LAST:event_readColorImageItemActionPerformed
+
+    private void saveCSVItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveCSVItemActionPerformed
+        saveCSVresults("CSVresult.csv");
+    }//GEN-LAST:event_saveCSVItemActionPerformed
+
 //    public void save() throws IOException {
 //        ImageIO.write(imagePanel1.getImg(), "PNG", new File("/Users/enricosantesarti/Desktop/tesi/prova.png"));
 //    }
-
     /**
      * @param args the command line arguments
      */
@@ -609,10 +459,10 @@ public class MainMicroPlastic extends javax.swing.JFrame {
             }
         });
     }
-    
+
     private Instances createDatasetLineOrNot() {
         ArrayList<Attribute> attributes = new ArrayList<>();
-        
+
         attributes.add(new Attribute("area"));
         attributes.add(new Attribute("perimeter"));
         attributes.add(new Attribute("compactness"));
@@ -621,10 +471,10 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         attributes.add(new Attribute("BBtoAreaRatio"));
         attributes.add(new Attribute("ellipseAxisRatio"));
         attributes.add(new Attribute("class", new ArrayList<>(Arrays.asList(classifierLineorNot.getClassName()))));
-        
+
         Instances dataset = new Instances("Platic Particles", attributes, 0);
         dataset.setClassIndex(dataset.numAttributes() - 1);
-        
+
         for (PlasticPiece b : segmenter.getPlasticsArray()) {
             GeometricFeature gf = b.getGeometricFeatures();
             ColorFeature cf = b.getColorFeatures();
@@ -637,32 +487,16 @@ public class MainMicroPlastic extends javax.swing.JFrame {
             v[4] = gf.widthHeightRatio;
             v[5] = gf.BBtoAreaRatio;
             v[6] = gf.ellipseAxisRatio;
-            /*v[7]=cf.avgRGB[1];
-                v[8]=cf.avgRGB[2];
-                v[9]=cf.avgRGB[3];
-                v[10]=cf.varRGB[1];
-                v[11]=cf.varRGB[2];
-                v[12]=cf.varRGB[3];
-                v[13]=cf.avgHSV[0];
-                v[14]=cf.avgHSV[1];
-                v[15]=cf.avgHSV[2];
-                v[16]= cf.varHSV[0];
-                v[17]=cf.varHSV[1];
-                v[18]=cf.varHSV[2];
-            for(int i = 19; i<275; i++)
-            {
-              v[i]= x[i-19];
-            }*/
             v[7] = 0.;
             Instance sample = new DenseInstance(1.0, v);
             dataset.add(sample);
         }
         return dataset;
     }
-    
+
     private Instances createDatasetPEL() {
         ArrayList<Attribute> attributes = new ArrayList<>();
-        
+
         attributes.add(new Attribute("area"));
         attributes.add(new Attribute("perimeter"));
         attributes.add(new Attribute("compactness"));
@@ -671,10 +505,10 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         attributes.add(new Attribute("BBtoAreaRatio"));
         attributes.add(new Attribute("ellipseAxisRatio"));
         attributes.add(new Attribute("class", new ArrayList<>(Arrays.asList(classifierPELorNot.getClassName()))));
-        
+
         Instances dataset = new Instances("Platic Particles", attributes, 0);
         dataset.setClassIndex(dataset.numAttributes() - 1);
-        
+
         for (PlasticPiece b : segmenter.getPlasticsArray()) {
             if (b.getParticleType() == "REST") {
                 GeometricFeature gf = b.getGeometricFeatures();
@@ -695,7 +529,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         }
         return dataset;
     }
-    
+
     private Instances createDatasetRest() {
         ArrayList<Attribute> attributes = new ArrayList<>();
         attributes.add(new Attribute("area"));
@@ -748,7 +582,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
                 v[16] = cf.varHSV[0];
                 v[17] = cf.varHSV[1];
                 v[18] = cf.varHSV[2];
-                
+
                 for (int i = 19; i < 275; i++) {
                     v[i] = x[i - 19];
                 }
@@ -759,7 +593,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         }
         return dataset;
     }
-    
+
     private Instances createDatasetTemporal() {
         ArrayList<Attribute> attributes = new ArrayList<>();
         attributes.add(new Attribute("area"));
@@ -781,14 +615,14 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         attributes.add(new Attribute("varH"));
         attributes.add(new Attribute("varS"));
         attributes.add(new Attribute("varV"));
-        
+
         attributes.add(new Attribute("class", new ArrayList<>(Arrays.asList(classifierRest.getClassName()))));
         Instances dataset = new Instances("Platic Particles", attributes, 0);
         dataset.setClassIndex(dataset.numAttributes() - 1);
         for (PlasticPiece b : segmenter.getPlasticsArray()) {
             GeometricFeature gf = b.getGeometricFeatures();
             ColorFeature cf = b.getColorFeatures();
-            
+
             double[] v = new double[20];
             v[0] = gf.area;
             v[1] = gf.perimeter;
@@ -810,13 +644,13 @@ public class MainMicroPlastic extends javax.swing.JFrame {
             v[17] = cf.varHSV[1];
             v[18] = cf.varHSV[2];
             v[19] = 0.;
-            
+
             Instance sample = new DenseInstance(1.0, v);
             dataset.add(sample);
         }
         return dataset;
     }
-    
+
     private String[] classifyLineOrNot() {
         classifierLineorNot.setDataset(createDatasetLineOrNot());
         String[] fragmentType = classifierLineorNot.classify();
@@ -824,13 +658,13 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         String[] finalType = new String[segmenter.getPlasticsArray().size()];
         for (PlasticPiece b : segmenter.getPlasticsArray()) {
             b.setParticleType(fragmentType[i]);
-            
+
             i++;
         }
-        
+
         return fragmentType;
     }
-    
+
     private String[] classifyPEl() {
         int count = 0;
         classifierPELorNot.setDataset(createDatasetPEL());
@@ -839,13 +673,13 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         for (int i = 0; i < segmenter.getPlasticsArray().size(); i++) {
             if (segmenter.getPlasticsArray().get(i).getParticleType() != "LINE") {
                 segmenter.getPlasticsArray().get(i).setParticleType(fragmentType[count]);
-                
+
                 count++;
             }
         }
         return fragmentType;
     }
-    
+
     private String[] classifyRest() {
         int count = 0;
         classifierRest.setDataset(createDatasetRest());
@@ -853,34 +687,34 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         for (int i = 0; i < segmenter.getPlasticsArray().size(); i++) {
             if (segmenter.getPlasticsArray().get(i).getParticleType() != "PEL" && segmenter.getPlasticsArray().get(i).getParticleType() != "LINE") {
                 segmenter.getPlasticsArray().get(i).setParticleType(fragmentType[count]);
-                
+
                 count++;
             }
         }
-        
+
         return fragmentType;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton BeWImageButton;
-    private javax.swing.JButton ClassifyButton;
-    private javax.swing.JButton ColoredImageButton;
     private javax.swing.JMenuItem aboutItem;
     private javax.swing.JMenuItem classifyItem;
-    private javax.swing.JMenuItem exitButton;
+    private javax.swing.JMenuItem exitItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
     private smacc.ImagePanel imagePanel1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JLabel labelInitHelp;
-    private javax.swing.JLabel labelInitTitle;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JMenuBar menuBar;
-    private javax.swing.JMenuItem newButton;
-    private javax.swing.JMenu optonsSubmenu;
+    private javax.swing.JMenuItem newSampleItem;
+    private javax.swing.JMenu optionsSubmenu;
     private javax.swing.JMenu processMenu;
-    private javax.swing.JMenuItem saveCSVButton;
+    private javax.swing.JMenuItem readColorImageItem;
+    private javax.swing.JMenuItem readTranspImageItem;
+    private javax.swing.JMenuItem saveCSVItem;
     private javax.swing.JMenuItem saveImageItem;
-    private javax.swing.JMenuItem saveImgResultButton;
+    private javax.swing.JMenuItem saveImgResultIten;
     private javax.swing.JMenuItem saveResultItem;
     private java.awt.ScrollPane scrollPane1;
     private javax.swing.JMenuItem setBorderItem;
@@ -896,5 +730,108 @@ public class MainMicroPlastic extends javax.swing.JFrame {
                 System.exit(0);
         }
     }
-    
+
+    private void readTransparencyImage() {
+        JFileChooser fc = new JFileChooser(new File("."));
+
+        FileFilter filter = new FileNameExtensionFilter("JPEG file", "jpg", "jpeg");
+        fc.addChoosableFileFilter(filter);
+        filter = new FileNameExtensionFilter("PNG file", "png");
+        fc.addChoosableFileFilter(filter);
+
+        int res = fc.showOpenDialog(null);
+
+        if (res == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fc.getSelectedFile();
+            try {
+                this.ImageBN = new Image(selectedFile);
+                segmenter.segmentImage(ConvertBufferedImage.convertFrom(this.ImageBN.getIamgeColored(), true, ImageType.pl(3, GrayU8.class)));
+                JOptionPane.showMessageDialog(null, "OK\nImage loaded correctly");
+            } catch (IOException ex) {
+            }
+        }
+    }
+
+    private void readColorImage() {
+        imagePanel1.setVisible(true);
+        JFileChooser fc = new JFileChooser(new File("."));
+        FileFilter filter = new FileNameExtensionFilter("JPEG file", "jpg", "jpeg");
+        fc.addChoosableFileFilter(filter);
+        filter = new FileNameExtensionFilter("PNG file", "png");
+        fc.addChoosableFileFilter(filter);
+        int res = fc.showOpenDialog(null);
+        if (res == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fc.getSelectedFile();
+            try {
+                this.ImageColor = new Image(selectedFile);
+                JOptionPane.showMessageDialog(null, "OK\nImage loaded correctly");
+            } catch (IOException ex) {
+            }
+        }
+    }
+
+    private void classifyImageParticles() {
+        JOptionPane.showMessageDialog(null, "Wait a moment the result will be shown automatically");
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+        BufferedImage imageA, imageB;
+        imageA = ImageBN.getIamgeColored();
+        imageB = ImageColor.getIamgeColored();
+
+        ImageStich = stitch(imageA, imageB, GrayU8.class);
+        imagePanel1.setImg(ImageStich);
+        segmenter.removeInutilPieces(ConvertBufferedImage.convertFrom(this.ImageStich, true, ImageType.pl(3, GrayU8.class)), segmenter.getPlasticsArray());
+        segmenter.removeOneInAnother(segmenter.getPlasticsArray());
+
+        imagePanel1.writeParticlesId(segmenter.getPlasticsArray(), true);
+
+        ColorFeature prova = new ColorFeature();
+        segmenter.setPlasticsArray(prova.ComputeColorFeatures(this.ImageStich, segmenter.getPlasticsArray()));
+
+        for (int a = 0; a < segmenter.getPlasticsArray().size(); a++) {
+            int x = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.x;
+            int y = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.y;
+            int w = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.width;
+            int h = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.height;
+            BufferedImage subImgage = imagePanel1.getImg().getSubimage(x, y, w, h);
+            LocalBinaryPatternsTest lbp = new LocalBinaryPatternsTest();
+            lbp.setUp();
+            try {
+                segmenter.getPlasticsArray().get(a).setLbp(lbp.smallRadiuslargeNeighbours2(subImgage));
+            } catch (Exception ex) {
+                Logger.getLogger(MainMicroPlastic.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        // classification proces
+        classifyLineOrNot();
+        classifyPEl();
+        classifyRest();
+
+        this.setCursor(Cursor.getDefaultCursor());
+
+        JOptionPane.showMessageDialog(null, "Classification process finishes");
+
+        imagePanel1.writeLineOrNot(segmenter.getPlasticsArray(), true);
+        imagePanel1.setImg(imagePanel1.ridemension(imagePanel1.getImg(), scale));
+
+        repaint();
+    }
+
+    private void changeImageScale() {
+        String s = (String) JOptionPane.showInputDialog(rootPane, "Set the image scale (from 0 to 1):", "Image Scale",
+                JOptionPane.PLAIN_MESSAGE, null, null, this.scale);
+
+        try {
+            double scaler = Double.parseDouble(s);
+            if (scaler >= 0 && scaler <= 1) {
+                this.scale = scaler;
+            } else {
+                JOptionPane.showMessageDialog(rootPane, "Scale to big");
+            }
+
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(rootPane, "Scale size format incorrect");
+        }
+    }
+
 }
