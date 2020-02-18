@@ -8,17 +8,14 @@ package smacc;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
 import javax.imageio.ImageIO;
-import javax.swing.Box;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import static smacc.ImageStitching.stitch;
@@ -41,6 +38,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     private double scale = 0.5;
     private int borderSize = 20;
     private double minArea = 150;
+    private boolean resultsSaved = true;
 
     /**
      * Creates new form NewJFrame
@@ -70,9 +68,9 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        scrollPane1 = new java.awt.ScrollPane();
-        imagePanel1 = new smacc.ImagePanel();
+        imagePanel = new javax.swing.JPanel();
+        scrollImage = new javax.swing.JScrollPane();
+        imageCanvas = new smacc.ImagePanel();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         newSampleItem = new javax.swing.JMenuItem();
@@ -86,8 +84,6 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         exitItem = new javax.swing.JMenuItem();
         processMenu = new javax.swing.JMenu();
         classifyItem = new javax.swing.JMenuItem();
-        saveImageItem = new javax.swing.JMenuItem();
-        saveResultItem = new javax.swing.JMenuItem();
         optionsSubmenu = new javax.swing.JMenu();
         setMinSizeItem = new javax.swing.JMenuItem();
         setBorderItem = new javax.swing.JMenuItem();
@@ -104,36 +100,35 @@ public class MainMicroPlastic extends javax.swing.JFrame {
             }
         });
 
-        jPanel1.setPreferredSize(new Dimension(850,600));
+        imagePanel.setPreferredSize(new Dimension(850,600));
 
-        //Color colorBack = new Color(255,77,77);
-        //imagePanel1.setBackground(colorBack);
-        //this.setTitle("SMACC v0.2");
-
-        javax.swing.GroupLayout imagePanel1Layout = new javax.swing.GroupLayout(imagePanel1);
-        imagePanel1.setLayout(imagePanel1Layout);
-        imagePanel1Layout.setHorizontalGroup(
-            imagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 852, Short.MAX_VALUE)
+        javax.swing.GroupLayout imageCanvasLayout = new javax.swing.GroupLayout(imageCanvas);
+        imageCanvas.setLayout(imageCanvasLayout);
+        imageCanvasLayout.setHorizontalGroup(
+            imageCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 846, Short.MAX_VALUE)
         );
-        imagePanel1Layout.setVerticalGroup(
-            imagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 579, Short.MAX_VALUE)
+        imageCanvasLayout.setVerticalGroup(
+            imageCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 582, Short.MAX_VALUE)
         );
 
-        scrollPane1.add(imagePanel1);
+        scrollImage.setViewportView(imageCanvas);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 742, Short.MAX_VALUE)
+        javax.swing.GroupLayout imagePanelLayout = new javax.swing.GroupLayout(imagePanel);
+        imagePanel.setLayout(imagePanelLayout);
+        imagePanelLayout.setHorizontalGroup(
+            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(imagePanelLayout.createSequentialGroup()
+                .addComponent(scrollImage)
                 .addGap(0, 0, 0))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
+        imagePanelLayout.setVerticalGroup(
+            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(imagePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scrollImage)
+                .addContainerGap())
         );
 
         fileMenu.setText("File");
@@ -145,6 +140,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
             }
         });
         fileMenu.add(newSampleItem);
+        newSampleItem.setToolTipText("New sample to process");
         fileMenu.add(jSeparator1);
 
         readTranspImageItem.setText("Read transparency image");
@@ -201,25 +197,6 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         });
         processMenu.add(classifyItem);
 
-        saveImageItem.setText("Save Image");
-        saveImageItem.setVisible(false);
-        saveImageItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveImageItemActionPerformed(evt);
-            }
-        });
-        processMenu.add(saveImageItem);
-        saveImageItem.getAccessibleContext().setAccessibleDescription("");
-
-        saveResultItem.setText("Save Result");
-        saveResultItem.setVisible(false);
-        saveResultItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveResultItemActionPerformed(evt);
-            }
-        });
-        processMenu.add(saveResultItem);
-
         optionsSubmenu.setText("Options");
 
         setMinSizeItem.setText("Set minimum size");
@@ -239,7 +216,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         });
         optionsSubmenu.add(setBorderItem);
 
-        setImageSizeItem.setText("Image Size");
+        setImageSizeItem.setText("Image visualization scale");
         setImageSizeItem.setVisible(true);
         setImageSizeItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -278,41 +255,22 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(imagePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(imagePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void saveImageItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveImageItemActionPerformed
-        try {
-            ImageIO.write(imagePanel1.getImg(), "PNG", new File("ImageResult.png"));
-            JOptionPane optionPane = new JOptionPane("Image has been saved!", JOptionPane.OK_OPTION);
-            JDialog dialog = optionPane.createDialog("Perfect!");
-            dialog.setAlwaysOnTop(true); // to show top of all other application
-            dialog.setVisible(true); // TODO add your handling code here:
-        } catch (IOException ex) {
-            Logger.getLogger(MainMicroPlastic.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_saveImageItemActionPerformed
-
-    private void saveResultItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveResultItemActionPerformed
-        saveCSVresults("CSVresult.csv");
-    }//GEN-LAST:event_saveResultItemActionPerformed
-
     private void saveCSVresults(String csVresultcsv) {
-        // Use relative path for Unix systems
         File f = new File(csVresultcsv);
         ResultManager n = new ResultManager();
         n.saveFeaturesToCSV(segmenter.getPlasticsArray(), f);
-        JOptionPane optionPane = new JOptionPane("CSV file has been saved!", JOptionPane.OK_OPTION);
-        JDialog dialog = optionPane.createDialog("Perfect!");
-        dialog.setAlwaysOnTop(true); // to show top of all other application
-        dialog.setVisible(true);
+        JOptionPane.showMessageDialog(null, "CSV file has been saved!");
+        resultsSaved = true;
     }
 
     private void setMinSizeItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setMinSizeItemActionPerformed
@@ -321,7 +279,11 @@ public class MainMicroPlastic extends javax.swing.JFrame {
 
         try {
             this.minArea = Double.parseDouble(s);
-            segmenter.setMinSize(this.minArea);
+            if (this.minArea <= 0) {
+                JOptionPane.showMessageDialog(rootPane, "Wrong minimum area");
+            } else {
+                segmenter.setMinSize(this.minArea);
+            }
         } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(rootPane, "Minimum size format incorrect");
         }
@@ -351,8 +313,6 @@ public class MainMicroPlastic extends javax.swing.JFrame {
                 a.setVisible(true);
             }
         });
-
-
     }//GEN-LAST:event_newSampleItemActionPerformed
 
     private void exitItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitItemActionPerformed
@@ -391,15 +351,41 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     }//GEN-LAST:event_useItemActionPerformed
 
     private void saveImgResultItenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveImgResultItenActionPerformed
-        // TODO add your handling code here:
+        try {
+            JFileChooser fc = new JFileChooser(".");
+            File file = new File("result-image.png");
+            fc.setSelectedFile(file);
+
+            fc.setAcceptAllFileFilterUsed(false);
+
+            FileFilter filter = new FileNameExtensionFilter("PNG files", "png");
+            fc.addChoosableFileFilter(filter);
+
+            int res = fc.showSaveDialog(null);
+
+            if (res == JFileChooser.APPROVE_OPTION) {
+
+                File selectedFile = fc.getSelectedFile();
+                String pngFilename = selectedFile.getCanonicalPath();
+
+                ImageIO.write(imageCanvas.getImg(), "PNG", new File(pngFilename));
+                JOptionPane.showMessageDialog(null, "Results image has been saved!");
+
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MainMicroPlastic.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }//GEN-LAST:event_saveImgResultItenActionPerformed
 
     private void classifyItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_classifyItemActionPerformed
         classifyImageParticles();
+
+        resultsSaved = false;
         
         classifyItem.setEnabled(false);
         optionsSubmenu.setEnabled(false);
-        
+
         saveImgResultIten.setEnabled(true);
         saveCSVItem.setEnabled(true);
     }//GEN-LAST:event_classifyItemActionPerformed
@@ -417,12 +403,28 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     }//GEN-LAST:event_readColorImageItemActionPerformed
 
     private void saveCSVItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveCSVItemActionPerformed
-        saveCSVresults("CSVresult.csv");
+        JFileChooser fc = new JFileChooser(".");
+        File file = new File("results.csv");
+        fc.setSelectedFile(file);
+
+        fc.setAcceptAllFileFilterUsed(false);
+
+        FileFilter filter = new FileNameExtensionFilter("CSV file", "csv");
+        fc.addChoosableFileFilter(filter);
+
+        int res = fc.showSaveDialog(null);
+
+        if (res == JFileChooser.APPROVE_OPTION) {
+            try {
+                File selectedFile = fc.getSelectedFile();
+                String csvFilename = selectedFile.getCanonicalPath();
+                saveCSVresults(csvFilename);
+            } catch (IOException ex) {
+                Logger.getLogger(MainMicroPlastic.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }//GEN-LAST:event_saveCSVItemActionPerformed
 
-//    public void save() throws IOException {
-//        ImageIO.write(imagePanel1.getImg(), "PNG", new File("/Users/enricosantesarti/Desktop/tesi/prova.png"));
-//    }
     /**
      * @param args the command line arguments
      */
@@ -701,8 +703,8 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     private javax.swing.JMenuItem exitItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
-    private smacc.ImagePanel imagePanel1;
-    private javax.swing.JPanel jPanel1;
+    private smacc.ImagePanel imageCanvas;
+    private javax.swing.JPanel imagePanel;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
@@ -713,10 +715,8 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     private javax.swing.JMenuItem readColorImageItem;
     private javax.swing.JMenuItem readTranspImageItem;
     private javax.swing.JMenuItem saveCSVItem;
-    private javax.swing.JMenuItem saveImageItem;
     private javax.swing.JMenuItem saveImgResultIten;
-    private javax.swing.JMenuItem saveResultItem;
-    private java.awt.ScrollPane scrollPane1;
+    private javax.swing.JScrollPane scrollImage;
     private javax.swing.JMenuItem setBorderItem;
     private javax.swing.JMenuItem setImageSizeItem;
     private javax.swing.JMenuItem setMinSizeItem;
@@ -724,10 +724,16 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void confirmCloseWindow() {
-        int res = JOptionPane.showConfirmDialog(null, "Do want to close the application?", "Close", JOptionPane.YES_NO_CANCEL_OPTION);
-        switch (res) {
-            case JOptionPane.YES_OPTION:
+        if (!resultsSaved) {
+            int res = JOptionPane.showConfirmDialog(null, "Results have not been saved. Continue closing?", "Close", JOptionPane.YES_NO_CANCEL_OPTION);
+            if (res == JOptionPane.YES_OPTION) {
                 System.exit(0);
+            }
+        } else {
+            int res = JOptionPane.showConfirmDialog(null, "Do want to close the application?", "Close", JOptionPane.YES_NO_CANCEL_OPTION);
+            if (res == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
         }
     }
 
@@ -753,7 +759,6 @@ public class MainMicroPlastic extends javax.swing.JFrame {
     }
 
     private void readColorImage() {
-        imagePanel1.setVisible(true);
         JFileChooser fc = new JFileChooser(new File("."));
         FileFilter filter = new FileNameExtensionFilter("JPEG file", "jpg", "jpeg");
         fc.addChoosableFileFilter(filter);
@@ -779,11 +784,11 @@ public class MainMicroPlastic extends javax.swing.JFrame {
         imageB = ImageColor.getIamgeColored();
 
         ImageStich = stitch(imageA, imageB, GrayU8.class);
-        imagePanel1.setImg(ImageStich);
+        imageCanvas.setImg(ImageStich);
         segmenter.removeInutilPieces(ConvertBufferedImage.convertFrom(this.ImageStich, true, ImageType.pl(3, GrayU8.class)), segmenter.getPlasticsArray());
         segmenter.removeOneInAnother(segmenter.getPlasticsArray());
 
-        imagePanel1.writeParticlesId(segmenter.getPlasticsArray(), true);
+        imageCanvas.writeParticlesId(segmenter.getPlasticsArray(), true);
 
         ColorFeature prova = new ColorFeature();
         segmenter.setPlasticsArray(prova.ComputeColorFeatures(this.ImageStich, segmenter.getPlasticsArray()));
@@ -793,7 +798,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
             int y = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.y;
             int w = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.width;
             int h = segmenter.getPlasticsArray().get(a).getGeometricFeatures().boundingBox.height;
-            BufferedImage subImgage = imagePanel1.getImg().getSubimage(x, y, w, h);
+            BufferedImage subImgage = imageCanvas.getImg().getSubimage(x, y, w, h);
             LocalBinaryPatternsTest lbp = new LocalBinaryPatternsTest();
             lbp.setUp();
             try {
@@ -811,9 +816,10 @@ public class MainMicroPlastic extends javax.swing.JFrame {
 
         JOptionPane.showMessageDialog(null, "Classification process finishes");
 
-        imagePanel1.writeLineOrNot(segmenter.getPlasticsArray(), true);
-        imagePanel1.setImg(imagePanel1.ridemension(imagePanel1.getImg(), scale));
+        imageCanvas.writeLineOrNot(segmenter.getPlasticsArray(), true);
+        imageCanvas.setImg(imageCanvas.redimension(imageCanvas.getImg(), scale));
 
+        revalidate();
         repaint();
     }
 
@@ -826,7 +832,7 @@ public class MainMicroPlastic extends javax.swing.JFrame {
             if (scaler >= 0 && scaler <= 1) {
                 this.scale = scaler;
             } else {
-                JOptionPane.showMessageDialog(rootPane, "Scale to big");
+                JOptionPane.showMessageDialog(rootPane, "Wrong image scale");
             }
 
         } catch (NumberFormatException nfe) {
